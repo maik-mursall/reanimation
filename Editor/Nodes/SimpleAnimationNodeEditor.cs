@@ -52,5 +52,53 @@ namespace Aarthificial.Reanimation.Editor.Nodes
         {
             return Selection.GetFiltered<Texture2D>(SelectionMode.Assets).Length > 0;
         }
+
+        [MenuItem("Assets/Create/Reanimator/Simple Animation (From Sprites)", false, 400)]
+        private static void CreateFromSprites()
+        {
+            var trailingNumbersRegex = new Regex(@"(\d+$)");
+
+            var sprites = Selection.GetFiltered<Sprite>(SelectionMode.Unfiltered);
+
+            var cels = sprites
+                .OrderBy(
+                    sprite =>
+                    {
+                        var match = trailingNumbersRegex.Match(sprite.name);
+                        return match.Success ? int.Parse(match.Groups[0].Captures[0].ToString()) : 0;
+                    }
+                )
+                .Select(sprite => new SimpleCel(sprite))
+                .ToArray();
+
+            var asset = SimpleAnimationNode.Create<SimpleAnimationNode>(
+                cels: cels
+            );
+            string baseName = trailingNumbersRegex.Replace(sprites[0].name, "");
+            asset.name = baseName + "animation";
+
+            string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(sprites[0]));
+            AssetDatabase.CreateAsset(asset, Path.Combine(assetPath ?? Application.dataPath, asset.name + ".asset"));
+            AssetDatabase.SaveAssets();
+        }
+
+        [MenuItem("Assets/Create/Reanimator/Simple Animation (From Sprites)", true, 400)]
+        private static bool CreateFromSpritesValidation()
+        {
+            return Selection.GetFiltered<Sprite>(SelectionMode.Unfiltered).Length > 0;
+        }
+        
+        [MenuItem("Assets/Create/Reanimator/Simple Animation (From SpriteSheet)", false, 400)]
+        private static void CreateFromSpriteSheet()
+        {
+            var window = (SimpleAnimationNodeSpriteSheetWindow)EditorWindow.GetWindow(typeof(SimpleAnimationNodeSpriteSheetWindow));
+            window.Show();
+        }
+        
+        [MenuItem("Assets/Create/Reanimator/Simple Animation (From SpriteSheet)", true, 400)]
+        private static bool CreateFromSpriteSheetValidation()
+        {
+            return Selection.GetFiltered<Texture2D>(SelectionMode.Assets).Length == 0;
+        }
     }
 }
