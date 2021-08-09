@@ -98,7 +98,7 @@ namespace Aarthificial.Reanimation.Editor.Nodes
         [MenuItem("Assets/Create/Reanimator/Simple Animation (From SpriteSheet)", true, 400)]
         private static bool CreateFromSpriteSheetValidation()
         {
-            return Selection.GetFiltered<Texture2D>(SelectionMode.Assets).Length == 0;
+            return Selection.GetFiltered<Texture2D>(SelectionMode.Assets).Length == 1;
         }
     }
 }
