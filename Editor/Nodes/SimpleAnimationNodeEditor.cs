@@ -98,7 +98,17 @@ namespace Aarthificial.Reanimation.Editor.Nodes
         [MenuItem("Assets/Create/Reanimator/Simple Animation (From SpriteSheet)", true, 400)]
         private static bool CreateFromSpriteSheetValidation()
         {
-            return Selection.GetFiltered<Texture2D>(SelectionMode.Assets).Length == 1;
+            var texture = Selection.GetFiltered<Texture2D>(SelectionMode.Assets).First();
+
+            if (!texture)
+                return false;
+
+            var textureImporter = (TextureImporter) AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(texture));
+
+            if (!textureImporter)
+                return false;
+            
+            return textureImporter.textureType == TextureImporterType.Sprite && textureImporter.spriteImportMode == SpriteImportMode.Multiple;
         }
     }
 }
