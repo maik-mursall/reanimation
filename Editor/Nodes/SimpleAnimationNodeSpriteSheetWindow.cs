@@ -87,7 +87,7 @@ namespace Aarthificial.Reanimation.Editor.Nodes
                 {
                     var driverDictionary = Array.Find(
                         tempDriverDictionary,
-                        dictionary => dictionary.frame == index
+                        dictionary => dictionary.frame == index % _framesPerClip
                     )?.dictionary;
 
                     return new SimpleCel(sprite, driverDictionary);
