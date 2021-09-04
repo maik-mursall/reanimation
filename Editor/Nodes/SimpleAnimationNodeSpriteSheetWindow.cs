@@ -17,6 +17,7 @@ namespace Aarthificial.Reanimation.Editor.Nodes
 
         private string _driverName = "driverName";
         private bool _autoIncrement = true;
+        private bool _generateAnimationEvents = false;
 
         private bool _constructSwitch = true;
         private string _switchDriverName = "switchDriverName";
@@ -38,6 +39,9 @@ namespace Aarthificial.Reanimation.Editor.Nodes
 
             _driverName = EditorGUILayout.TextField("Driver Name", _driverName);
             _autoIncrement = EditorGUILayout.Toggle("Auto Increment", _autoIncrement);
+            
+            if (!_autoIncrement)
+                _generateAnimationEvents = EditorGUILayout.Toggle("Generate Animation Events", _generateAnimationEvents);
 
             _constructSwitch = EditorGUILayout.BeginToggleGroup("Construct Switch", _constructSwitch);
 
@@ -85,10 +89,23 @@ namespace Aarthificial.Reanimation.Editor.Nodes
                 )
                 .Select((sprite, index) =>
                 {
+                    var relativeFrame = index % _framesPerClip;
+                    
                     var driverDictionary = Array.Find(
                         tempDriverDictionary,
-                        dictionary => dictionary.frame == index % _framesPerClip
+                        dictionary => dictionary.frame == relativeFrame
                     )?.dictionary;
+
+                    if (_generateAnimationEvents)
+                    {
+                        if (relativeFrame < _framesPerClip - 1)
+                        {
+                            driverDictionary ??= new DriverDictionary();
+                            
+                            driverDictionary.keys.Add(_driverName);
+                            driverDictionary.values.Add(relativeFrame + 1);
+                        }
+                    }
 
                     return new SimpleCel(sprite, driverDictionary);
                 })
